@@ -7,7 +7,7 @@ export type ProductItem = {
   price: string
   summary: string
   desc: string
-  swatch: string
+  image: string
   specs: Spec[]
 }
 
@@ -19,7 +19,7 @@ export const featuredItems: ProductItem[] = [
     price: 'NT$ 680 / 條',
     summary: '焙茶蛋糕體捲入抹茶鮮奶油，切面是一顆滾圓的綠。冷藏兩小時後食用最好。',
     desc: '焙茶蛋糕體薄薄一層，捲入不加糖的抹茶鮮奶油。切面是一顆滾圓的綠，邊緣有一圈焙茶的深色。冷藏兩小時後食用最好，奶油會剛好定形而不硬。',
-    swatch: 'repeating-linear-gradient(135deg, #F1E4C4 0 10px, #FCF4E4 10px 20px)',
+    image: '/signature-roll.png',
     specs: [
       { k: '尺寸', v: '長 18cm / 約 6 片' },
       { k: '抹茶', v: '宇治覆下・石磨' },
@@ -34,7 +34,7 @@ export const featuredItems: ProductItem[] = [
     price: 'NT$ 1,080 / 模',
     summary: '表面鋪滿抹茶菠蘿粒，內裡近乎流動。整模六吋，切八刀剛好。',
     desc: '高溫短時烤出焦色的表面，鋪滿抹茶菠蘿粒；內裡近乎流動，靠冷藏才收住。整模六吋，切八刀剛好，室溫回溫十分鐘風味最完整。',
-    swatch: 'repeating-linear-gradient(135deg, #E3EBCB 0 10px, #FCF4E4 10px 20px)',
+    image: '/signature-basque.png',
     specs: [
       { k: '尺寸', v: '六吋 / 8 片' },
       { k: '抹茶', v: '宇治覆下・石磨' },
@@ -49,7 +49,7 @@ export const featuredItems: ProductItem[] = [
     price: 'NT$ 320 / 盒',
     summary: '烙印抹茶餅皮夾大納言粒餡，帶回去的路上還是溫的。兩入一盒。',
     desc: '烙印的抹茶餅皮夾大納言粒餡，紅豆整顆留形，只糖漬不磨泥。現烤裝盒，帶回去的路上還是溫的。兩入一盒，也可單買。',
-    swatch: 'repeating-linear-gradient(135deg, #F3D6B4 0 10px, #FCF4E4 10px 20px)',
+    image: '/signature-azuki.png',
     specs: [
       { k: '份量', v: '兩入 / 盒' },
       { k: '紅豆', v: '北海道大納言' },
@@ -68,6 +68,13 @@ export const menuItems: { name: string; price: string }[] = [
   { name: '抹茶千層小方', price: '220' },
   { name: '焙茶蕨餅', price: '240' },
   { name: '抹茶罐裝茶粉（30g）', price: '980' },
+  { name: '宇治抹茶碗', price: '280' },
+  { name: '抹茶提拉米蘇', price: '260' },
+  { name: '抹茶蒙布朗', price: '340' },
+  { name: '焙茶生乳捲', price: '650' },
+  { name: '抹茶費南雪（三入）', price: '180' },
+  { name: '抹茶布丁', price: '150' },
+  { name: '抹茶冰淇淋', price: '140' },
 ]
 
 export const navLinks = [

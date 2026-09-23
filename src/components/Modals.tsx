@@ -17,12 +17,8 @@ export function ProductModal({ item, onClose, onBook }: ProductModalProps) {
         aria-modal="true"
         aria-label={item.name}
       >
-        <div className="product-shot" style={{ background: item.swatch }}>
-          <span>
-            product shot
-            <br />
-            {item.name}
-          </span>
+        <div className="product-shot">
+          <img src={item.image} alt={item.name} width={640} height={800} />
         </div>
         <div className="product-body">
           <div>

@@ -86,13 +86,13 @@ export default function App() {
         <figure data-shutter className="hero-figure">
           <img
             data-pan
-            src="/hero.png"
+            src="/hero.png?v=4"
             alt="抹茶甜點全桌"
             width={1180}
             height={740}
           />
         </figure>
-        <figcaption className="hero-caption">the whole table, 12 pieces</figcaption>
+        <figcaption className="hero-caption">the whole table, seasonal pieces</figcaption>
       </section>
 
       <section id="season" className="section season">
@@ -107,12 +107,8 @@ export default function App() {
           <div className="cards">
             {featuredItems.map((item) => (
               <article data-reveal key={item.id} className="card">
-                <div className="card-shot" style={{ background: item.swatch }}>
-                  <span>
-                    product shot
-                    <br />
-                    {item.name}
-                  </span>
+                <div className="card-shot">
+                  <img src={item.image} alt={item.name} width={640} height={800} />
                 </div>
                 <h3 className="serif">{item.name}</h3>
                 <p>{item.summary}</p>
@@ -159,7 +155,7 @@ export default function App() {
               </div>
               <div>
                 <div className="stat-value serif">
-                  <span data-count>12</span>
+                  <span data-count>15</span>
                 </div>
                 <div className="mono stat-label">今季品項</div>
               </div>
@@ -173,11 +169,7 @@ export default function App() {
             </div>
           </div>
           <div data-shutter className="craft-shot">
-            <span>
-              process shot
-              <br />
-              石磨與茶筅
-            </span>
+            <img src="/craft.png" alt="石磨與茶筅" width={800} height={800} />
           </div>
         </div>
       </section>
@@ -254,11 +246,11 @@ export default function App() {
               來店
             </h2>
             <p className="visit-text">
-              台北市大安區永康街 12 巷 5 號
+              台北市青葉區茶園路一段 8 巷 3 號
               <br />
               週三至週日 12:00 — 19:00
               <br />
-              02-2708-0412
+              02-0000-0412
             </p>
           </div>
           <div data-reveal className="visit-cta">
