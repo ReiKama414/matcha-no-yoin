@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Shippori+Mincho:wght@400;500;600&family=Noto+Serif+TC:wght@400;500;600&family=Noto+Sans+TC:wght@200;300;400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #FCF4E4; }
+  a { color: #1F4531; text-decoration: none; }
+  a:hover { color: #7C9B3C; }
+  @keyframes charIn { from { opacity: 0; transform: translateY(0.42em) rotate(4deg); filter: blur(10px); } to { opacity: 1; transform: none; filter: blur(0); } }
+  @keyframes rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+  @keyframes riseSoft { from { opacity: 0; transform: translateY(40px) scale(0.985); } to { opacity: 1; transform: none; } }
+  @keyframes wipeUp { from { opacity: 0; clip-path: inset(100% 0 0 0); transform: translateY(0.3em); } to { opacity: 1; clip-path: inset(-20% 0 -20% 0); transform: none; } }
+  @keyframes shutter { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+  @keyframes pan { from { transform: scale(1.18) translateY(-2%); } to { transform: scale(1.02) translateY(2%); } }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(-26px); } to { opacity: 1; transform: none; } }
+  @keyframes checkerDrift { from { background-position: 0 0; } to { background-position: 176px 176px; } }
+  @keyframes ribbonL { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes ribbonR { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+  @keyframes progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  body[data-gsap] [data-reveal], body[data-gsap] [data-wipe], body[data-gsap] [data-shutter],
+  body[data-gsap] [data-row], body[data-gsap] [data-pan], body[data-gsap] [data-bar] { animation: none !important; }
+  [data-reveal] { animation: riseSoft 1.1s cubic-bezier(0.22,1,0.36,1) both; }
+  [data-wipe] { animation: wipeUp 1.15s cubic-bezier(0.22,1,0.36,1) both; }
+  [data-shutter] { animation: shutter 1.3s cubic-bezier(0.19,1,0.22,1) both; }
+  [data-pan] { animation: pan 26s ease-in-out infinite alternate; }
+  [data-row] { animation: slideIn 0.9s cubic-bezier(0.22,1,0.36,1) both; }
+  [data-bar] { animation: progress 1.6s cubic-bezier(0.22,1,0.36,1) 0.6s both; }
+  @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes sheetIn { from { opacity: 0; transform: translateY(46px) scale(0.985); } to { opacity: 1; transform: none; } }
+  #season article:nth-of-type(2) { animation-delay: 0.14s; }
+  #season article:nth-of-type(3) { animation-delay: 0.28s; }
+  #menu li:nth-child(1) { animation-delay: 0.05s; }
+  #menu li:nth-child(2) { animation-delay: 0.11s; }
+  #menu li:nth-child(3) { animation-delay: 0.17s; }
+  #menu li:nth-child(4) { animation-delay: 0.23s; }
+  #menu li:nth-child(5) { animation-delay: 0.29s; }
+  #menu li:nth-child(6) { animation-delay: 0.35s; }
+  #menu li:nth-child(7) { animation-delay: 0.41s; }
+  #menu li:nth-child(8) { animation-delay: 0.47s; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition-duration: 0.001s !important; }
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script>
+(function () {
+  var tries = 0;
+  function init() {
+    if (window.__matchaGsap) return;
+    var g = window.gsap, ST = window.ScrollTrigger;
+    var ready = g && ST && document.querySelector('[data-shutter]') && document.querySelector('#menu li');
+    if (!ready) { if (tries++ < 120) return setTimeout(init, 120); return; }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    window.__matchaGsap = true;
+    g.registerPlugin(ST);
+    document.body.setAttribute('data-gsap', '1');
+
+    var E = 'power3.out';
+    g.from('h1 span span', { yPercent: 70, opacity: 0, rotate: 5, filter: 'blur(12px)', duration: 1.1, ease: 'expo.out', stagger: 0.06, delay: 0.1 });
+    g.from('h1 ~ p, h1 ~ div', { y: 26, opacity: 0, duration: 1, ease: E, stagger: 0.12, delay: 0.85 });
+
+    function play(el, from, extra) {
+      var to = { opacity: 1, x: 0, y: 0, yPercent: 0, scale: 1, clipPath: 'inset(0% 0% 0% 0%)', duration: 1.1, ease: E, clearProps: 'clipPath,filter' };
+      for (var kk in (extra || {})) to[kk] = extra[kk];
+      g.fromTo(el, from, to);
+    }
+    function whenSeen(el, run) {
+      if (!('IntersectionObserver' in window)) { run(); return; }
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { io.disconnect(); run(); } });
+      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+      io.observe(el);
+      setTimeout(function () { io.disconnect(); run(); }, 9000);
+    }
+    function group(sel, from, extra, step) {
+      g.utils.toArray(sel).forEach(function (el, i) {
+        var f = Object.assign({}, from);
+        whenSeen(el, function () { play(el, f, Object.assign({ delay: (step || 0) * i }, extra || {})); });
+      });
+    }
+    group('[data-reveal]:not(#season article)', { opacity: 0, y: 46, scale: 0.985 });
+    group('[data-wipe]', { opacity: 0, yPercent: 28, clipPath: 'inset(100% 0% 0% 0%)' }, { duration: 1.15, ease: 'expo.out' });
+    group('[data-shutter]', { clipPath: 'inset(0% 0% 100% 0%)' }, { duration: 1.4, ease: 'expo.out' });
+    group('#season article', { opacity: 0, y: 56 }, null, 0.1);
+    g.utils.toArray('#menu ul').forEach(function (ul) {
+      whenSeen(ul, function () {
+        g.fromTo(ul.children, { opacity: 0, x: -28 }, { opacity: 1, x: 0, duration: 0.8, ease: E, stagger: 0.06 });
+      });
+    });
+
+    var img = document.querySelector('[data-pan]');
+    if (img) {
+      g.set(img, { scale: 1.14 });
+      g.to(img, { yPercent: -7, scale: 1.02, ease: 'none',
+        scrollTrigger: { trigger: img.parentElement, start: 'top bottom', end: 'bottom top', scrub: 0.6 } });
+    }
+    var bar = document.querySelector('[data-bar]');
+    if (bar) {
+      var tick = function () {
+        var max = (document.documentElement.scrollHeight - window.innerHeight) || 1;
+        var p = Math.min(1, Math.max(0, (window.scrollY || document.documentElement.scrollTop || 0) / max));
+        bar.style.transformOrigin = 'left center';
+        bar.style.transform = 'scaleX(' + p + ')';
+      };
+      window.addEventListener('scroll', tick, { passive: true });
+      window.addEventListener('resize', tick);
+      tick();
+    }
+    g.utils.toArray('[data-count]').forEach(function (el) {
+      var end = parseFloat(el.textContent) || 0, o = { v: 0 };
+      whenSeen(el, function () {
+        g.to(o, { v: end, duration: 1.4, ease: 'power2.out',
+          onUpdate: function () { el.textContent = String(Math.round(o.v)); },
+          onComplete: function () { el.textContent = String(end); } });
+      });
+    });
+    ST.refresh();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  setTimeout(init, 400);
+})();
+</script>
+</helmet>
+
+<div style="font-family: 'Noto Sans TC', sans-serif; color: #2B2A20; background: #FCF4E4; overflow: hidden;">
+
+  <header style="position: sticky; top: 0; z-index: 60; background: rgba(252,244,228,0.92); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(31,69,49,0.14);">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 18px 5vw;">
+      <div style="display: flex; align-items: baseline; gap: 10px;">
+        <span style="font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Noto Serif TC', serif; font-weight: 700; font-size: 20px; letter-spacing: 0.14em; color: #1F4531;">青翠</span>
+        <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: #7C9B3C; text-transform: uppercase;">matcha atelier</span>
+      </div>
+      <nav style="display: flex; gap: 26px; font-size: 13px; letter-spacing: 0.08em;">
+        <a href="#season" style="position: relative; padding-bottom: 4px; transition: color 0.3s ease;" style-after="content: ''; position: absolute; left: 0; bottom: 0; width: 100%; height: 1px; background: #7C9B3C; transform: scaleX(0); transform-origin: left; transition: transform 0.45s cubic-bezier(0.22,1,0.36,1);" style-hover="color: #7C9B3C;">節令</a>
+        <a href="#craft" style="position: relative; padding-bottom: 4px; transition: color 0.3s ease;" style-after="content: ''; position: absolute; left: 0; bottom: 0; width: 100%; height: 1px; background: #7C9B3C; transform: scaleX(0); transform-origin: left; transition: transform 0.45s cubic-bezier(0.22,1,0.36,1);" style-hover="color: #7C9B3C;">工序</a>
+        <a href="#menu" style="position: relative; padding-bottom: 4px; transition: color 0.3s ease;" style-after="content: ''; position: absolute; left: 0; bottom: 0; width: 100%; height: 1px; background: #7C9B3C; transform: scaleX(0); transform-origin: left; transition: transform 0.45s cubic-bezier(0.22,1,0.36,1);" style-hover="color: #7C9B3C;">品項</a>
+        <a href="#visit" style="position: relative; padding-bottom: 4px; transition: color 0.3s ease;" style-after="content: ''; position: absolute; left: 0; bottom: 0; width: 100%; height: 1px; background: #7C9B3C; transform: scaleX(0); transform-origin: left; transition: transform 0.45s cubic-bezier(0.22,1,0.36,1);" style-hover="color: #7C9B3C;">來店</a>
+      </nav>
+    </div>
+    <div data-bar style="height: 2px; background: #7C9B3C; transform-origin: left; transform: scaleX(0);"></div>
+  </header>
+
+  <section style="position: relative; padding: 0 0 clamp(48px, 7vw, 96px); background:
+      repeating-conic-gradient(from 0deg at 50% 50%, #F4DC94 0deg 90deg, #FCF4E4 90deg 180deg) 0 0 / 88px 88px; animation: checkerDrift 30s linear infinite;">
+    <div style="background: linear-gradient(180deg, rgba(252,244,228,0.0) 0%, rgba(252,244,228,0.72) 46%, rgba(252,244,228,0.96) 100%); padding: clamp(56px, 9vw, 130px) 5vw clamp(24px, 4vw, 48px); text-align: center;">
+      <p style="margin: 0 0 22px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.4em; color: #7C9B3C; text-transform: uppercase; animation: rise 0.9s cubic-bezier(0.22,1,0.36,1) both;">season 2026 / uji harvest</p>
+      <h1 style="margin: 0; font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Noto Serif TC', serif; font-weight: 600; font-size: clamp(40px, 7.4vw, 104px); line-height: 1.08; letter-spacing: 0.02em; color: #1F4531;">
+        <span style="display: flex; justify-content: center;">
+          <span style="display: inline-block; animation: charIn 1.1s cubic-bezier(0.19,1,0.22,1) 0.10s both;">一</span><span style="display: inline-block; animation: charIn 1.1s cubic-bezier(0.19,1,0.22,1) 0.18s both;">席</span><span style="display: inline-block; animation: charIn 1.1s cubic-bezier(0.19,1,0.22,1) 0.26s both;">抹</span><span style="display: inline-block; animation: charIn 1.1s cubic-bezier(0.19,1,0.22,1) 0.34s both;">茶</span>
+        </span>
+        <span style="display: flex; justify-content: center;">
+          <span style="display: inline-block; animation: charIn 1.1s cubic-bezier(0.19,1,0.22,1) 0.44s both;">擺</span><span style="display: inline-block; animation: charIn 1.1s cubic-bezier(0.19,1,0.22,1) 0.52s both;">滿</span><span style="display: inline-block; animation: charIn 1.1s cubic-bezier(0.19,1,0.22,1) 0.60s both;">整</span><span style="display: inline-block; animation: charIn 1.1s cubic-bezier(0.19,1,0.22,1) 0.68s both;">張</span><span style="display: inline-block; animation: charIn 1.1s cubic-bezier(0.19,1,0.22,1) 0.76s both;">餐</span><span style="display: inline-block; animation: charIn 1.1s cubic-bezier(0.19,1,0.22,1) 0.84s both;">桌</span>
+        </span>
+      </h1>
+      <p style="margin: 26px auto 0; max-width: 34em; font-size: clamp(15px, 1.3vw, 17px); font-weight: 300; line-height: 1.95; color: #4A4A3C; text-wrap: pretty; animation: rise 1s cubic-bezier(0.22,1,0.36,1) 0.9s both;">
+        從宇治石磨抹茶到大納言紅豆，十二道甜點以同一片綠色串起。每一季我們只做一桌，端上來的時候，桌布也是這個顏色。
+      </p>
+      <div style="display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 34px; animation: rise 1s cubic-bezier(0.22,1,0.36,1) 1.05s both;">
+        <a href="#menu" style="position: relative; overflow: hidden; padding: 14px 30px; border-radius: 999px; background: #1F4531; color: #FCF4E4; font-size: 13px; letter-spacing: 0.14em; transition: color 0.35s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1), box-shadow 0.4s ease;" style-hover="transform: translateY(-3px); box-shadow: 0 16px 28px -18px rgba(31,69,49,0.8);">看今季品項</a>
+        <a href="#visit" onClick="{{ openBooking }}" style="padding: 14px 30px; border-radius: 999px; border: 1px solid rgba(31,69,49,0.35); font-size: 13px; letter-spacing: 0.14em; transition: background 0.35s ease, border-color 0.35s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1);" style-hover="border-color: #1F4531; background: rgba(124,155,60,0.14); transform: translateY(-3px);">預約茶席</a>
+      </div>
+    </div>
+
+    <figure data-shutter style="margin: 0 auto; width: min(90vw, 1180px); border-radius: 6px; overflow: hidden; box-shadow: 0 34px 64px -34px rgba(43,42,32,0.5);">
+      <img data-pan src="uploads/pasted-1789651497055-0.png" alt="抹茶甜點全桌" style="display: block; width: 100%; height: auto; will-change: transform;">
+    </figure>
+    <figcaption style="width: min(90vw, 1180px); margin: 12px auto 0; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.22em; color: #4A4A3C; text-transform: uppercase;">the whole table, 12 pieces</figcaption>
+  </section>
+
+  <section id="season" style="padding: clamp(64px, 9vw, 128px) 5vw; background: #FCF4E4;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: clamp(24px, 3vw, 44px); max-width: 1180px; margin: 0 auto;">
+      <div style="grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 8px;">
+        <h2 data-wipe style="margin: 0; font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Noto Serif TC', serif; font-weight: 600; font-size: clamp(26px, 3.2vw, 44px); color: #1F4531;">今季三款招牌</h2>
+        <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.24em; color: #7C9B3C;">01 — 03</span>
+      </div>
+
+      <article data-reveal style="display: flex; flex-direction: column; gap: 16px; transition: transform 0.6s cubic-bezier(0.22,1,0.36,1);" style-hover="transform: translateY(-10px);">
+        <div style="position: relative; aspect-ratio: 4 / 5; border-radius: 4px; overflow: hidden; background: repeating-linear-gradient(135deg, #F1E4C4 0 8px, #FCF4E4 8px 16px); display: flex; align-items: center; justify-content: center; text-align: center; transition: box-shadow 0.6s ease;">
+          <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: #6B6A5C;">product shot<br>抹茶生乳捲</span>
+        </div>
+        <h3 style="margin: 0; font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Noto Serif TC', serif; font-size: 20px; color: #1F4531;">抹茶生乳捲</h3>
+        <p style="margin: 0; font-size: 14px; font-weight: 300; line-height: 1.9; color: #4A4A3C;">焙茶蛋糕體捲入抹茶鮮奶油，切面是一顆滾圓的綠。冷藏兩小時後食用最好。</p>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+          <span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #7C9B3C;">NT$ 680 / 條</span>
+          <button type="button" onClick="{{ openRoll }}" style="border: 1px solid rgba(31,69,49,0.3); background: transparent; border-radius: 999px; padding: 8px 16px; font-family: 'Noto Sans TC', sans-serif; font-size: 12px; letter-spacing: 0.08em; color: #1F4531; cursor: pointer; transition: background 0.35s ease, border-color 0.35s ease;" style-hover="background: rgba(124,155,60,0.16); border-color: #1F4531;">看細節</button>
+        </div>
+      </article>
+
+      <article data-reveal style="display: flex; flex-direction: column; gap: 16px; transition: transform 0.6s cubic-bezier(0.22,1,0.36,1);" style-hover="transform: translateY(-10px);">
+        <div style="position: relative; aspect-ratio: 4 / 5; border-radius: 4px; overflow: hidden; background: repeating-linear-gradient(135deg, #E3EBCB 0 8px, #FCF4E4 8px 16px); display: flex; align-items: center; justify-content: center; text-align: center;">
+          <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: #6B6A5C;">product shot<br>抹茶巴斯克</span>
+        </div>
+        <h3 style="margin: 0; font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Noto Serif TC', serif; font-size: 20px; color: #1F4531;">抹茶巴斯克</h3>
+        <p style="margin: 0; font-size: 14px; font-weight: 300; line-height: 1.9; color: #4A4A3C;">表面鋪滿抹茶菠蘿粒，內裡近乎流動。整模六吋，切八刀剛好。</p>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+          <span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #7C9B3C;">NT$ 1,080 / 模</span>
+          <button type="button" onClick="{{ openBasque }}" style="border: 1px solid rgba(31,69,49,0.3); background: transparent; border-radius: 999px; padding: 8px 16px; font-family: 'Noto Sans TC', sans-serif; font-size: 12px; letter-spacing: 0.08em; color: #1F4531; cursor: pointer; transition: background 0.35s ease, border-color 0.35s ease;" style-hover="background: rgba(124,155,60,0.16); border-color: #1F4531;">看細節</button>
+        </div>
+      </article>
+
+      <article data-reveal style="display: flex; flex-direction: column; gap: 16px; transition: transform 0.6s cubic-bezier(0.22,1,0.36,1);" style-hover="transform: translateY(-10px);">
+        <div style="position: relative; aspect-ratio: 4 / 5; border-radius: 4px; overflow: hidden; background: repeating-linear-gradient(135deg, #F3D6B4 0 8px, #FCF4E4 8px 16px); display: flex; align-items: center; justify-content: center; text-align: center;">
+          <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: #6B6A5C;">product shot<br>紅豆抹茶餅</span>
+        </div>
+        <h3 style="margin: 0; font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Noto Serif TC', serif; font-size: 20px; color: #1F4531;">紅豆抹茶餅</h3>
+        <p style="margin: 0; font-size: 14px; font-weight: 300; line-height: 1.9; color: #4A4A3C;">烙印抹茶餅皮夾大納言粒餡，帶回去的路上還是溫的。兩入一盒。</p>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+          <span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #7C9B3C;">NT$ 320 / 盒</span>
+          <button type="button" onClick="{{ openCake }}" style="border: 1px solid rgba(31,69,49,0.3); background: transparent; border-radius: 999px; padding: 8px 16px; font-family: 'Noto Sans TC', sans-serif; font-size: 12px; letter-spacing: 0.08em; color: #1F4531; cursor: pointer; transition: background 0.35s ease, border-color 0.35s ease;" style-hover="background: rgba(124,155,60,0.16); border-color: #1F4531;">看細節</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="craft" style="position: relative; padding: clamp(64px, 9vw, 128px) 5vw; background: #1F4531; color: #F1EEDD;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: clamp(32px, 5vw, 80px); max-width: 1180px; margin: 0 auto; align-items: center;">
+      <div>
+        <p data-reveal style="margin: 0 0 20px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.34em; color: #B9CE7C; text-transform: uppercase;">craft</p>
+        <h2 data-wipe style="margin: 0 0 24px; font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Noto Serif TC', serif; font-weight: 600; font-size: clamp(26px, 3.4vw, 48px); line-height: 1.3;">石磨一小時<br>只得四十克</h2>
+        <p data-reveal style="margin: 0 0 18px; font-size: 15px; font-weight: 300; line-height: 2; color: #DCDCC8; max-width: 34em;">茶園採的是四月第一批覆下茶，蒸青、乾燥、去莖，再以石臼低速研磨。轉快了會生熱，熱了就苦。</p>
+        <p data-reveal style="margin: 0; font-size: 15px; font-weight: 300; line-height: 2; color: #DCDCC8; max-width: 34em;">所有甜點在開店前三小時內完成，不隔夜。當日沒賣完的，我們自己吃。</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 40px; margin-top: 40px;">
+          <div>
+            <div style="display: flex; align-items: baseline; font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Noto Serif TC', serif; font-size: 34px; color: #B9CE7C;">
+              <span data-count>40</span><span style="font-size: 20px;">g</span>
+            </div>
+            <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: #C9C9B4;">每小時產量</div>
+          </div>
+          <div>
+            <div style="font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Noto Serif TC', serif; font-size: 34px; color: #B9CE7C;">
+              <span data-count>12</span>
+            </div>
+            <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: #C9C9B4;">今季品項</div>
+          </div>
+          <div>
+            <div style="display: flex; align-items: baseline; font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Noto Serif TC', serif; font-size: 34px; color: #B9CE7C;">
+              <span data-count>3</span><span style="font-size: 20px;">h</span>
+            </div>
+            <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: #C9C9B4;">開店前完成</div>
+          </div>
+        </div>
+      </div>
+      <div data-shutter style="aspect-ratio: 1 / 1; border-radius: 4px; overflow: hidden; background: repeating-linear-gradient(135deg, rgba(185,206,124,0.22) 0 9px, rgba(241,238,221,0.06) 9px 18px); display: flex; align-items: center; justify-content: center; text-align: center;">
+        <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: #DCDCC8;">process shot<br>石磨與茶筅</span>
+      </div>
+    </div>
+  </section>
+
+  <div style="background: #1F4531; padding: clamp(28px, 4vw, 44px) 0; display: flex; flex-direction: column; gap: 14px; overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+      mask-image: linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);">
+    <div style="display: flex; width: max-content; animation: ribbonL 64s linear infinite;" style-hover="animation-play-state: paused;">
+      <span style="display: flex; align-items: center; gap: 44px; padding-right: 44px; font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Noto Serif TC', serif; font-weight: 400; font-size: clamp(26px, 4vw, 58px); letter-spacing: 0.12em; color: #F1EEDD; white-space: nowrap;">宇治覆下<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: #B9CE7C;">01</span>石臼低速<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: #B9CE7C;">02</span>大納言紅豆<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: #B9CE7C;">03</span>當日現做<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: #B9CE7C;">04</span></span>
+      <span aria-hidden="true" style="display: flex; align-items: center; gap: 44px; padding-right: 44px; font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Noto Serif TC', serif; font-weight: 400; font-size: clamp(26px, 4vw, 58px); letter-spacing: 0.12em; color: #F1EEDD; white-space: nowrap;">宇治覆下<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: #B9CE7C;">01</span>石臼低速<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: #B9CE7C;">02</span>大納言紅豆<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: #B9CE7C;">03</span>當日現做<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: #B9CE7C;">04</span></span>
+    </div>
+    <div style="display: flex; width: max-content; animation: ribbonR 86s linear infinite;">
+      <span style="display: flex; gap: 36px; padding-right: 36px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.34em; color: #9BB05E; text-transform: uppercase; white-space: nowrap;"><span>stone milled</span><span>kyoto uji</span><span>no preservatives</span><span>made daily</span><span>taipei</span><span>stone milled</span><span>kyoto uji</span><span>no preservatives</span><span>made daily</span><span>taipei</span></span>
+      <span aria-hidden="true" style="display: flex; gap: 36px; padding-right: 36px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.34em; color: #9BB05E; text-transform: uppercase; white-space: nowrap;"><span>stone milled</span><span>kyoto uji</span><span>no preservatives</span><span>made daily</span><span>taipei</span><span>stone milled</span><span>kyoto uji</span><span>no preservatives</span><span>made daily</span><span>taipei</span></span>
+    </div>
+  </div>
+
+  <section id="menu" style="padding: clamp(64px, 9vw, 128px) 5vw; background:
+      repeating-conic-gradient(from 0deg at 50% 50%, #F3C79A 0deg 90deg, #FCF4E4 90deg 180deg) 0 0 / 64px 64px;">
+    <div data-reveal style="max-width: 1180px; margin: 0 auto; background: #FCF4E4; padding: clamp(28px, 4vw, 64px); border-radius: 6px;">
+      <div style="display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 36px;">
+        <h2 data-wipe style="margin: 0; font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Noto Serif TC', serif; font-weight: 600; font-size: clamp(26px, 3.2vw, 44px); color: #1F4531;">全席品項</h2>
+        <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.24em; color: #7C9B3C;">menu / 2026 autumn</span>
+      </div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 0 clamp(24px, 4vw, 64px);">
+        <li data-row style="display: flex; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid rgba(31,69,49,0.16); animation-range: entry 6% entry 52%; transition: padding-left 0.4s cubic-bezier(0.22,1,0.36,1), color 0.35s ease;" style-hover="padding-left: 12px; color: #7C9B3C;"><span>抹茶生乳捲</span><span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #4A4A3C;">680</span></li>
+        <li data-row style="display: flex; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid rgba(31,69,49,0.16); animation-range: entry 10% entry 56%; transition: padding-left 0.4s cubic-bezier(0.22,1,0.36,1), color 0.35s ease;" style-hover="padding-left: 12px; color: #7C9B3C;"><span>抹茶巴斯克（六吋）</span><span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #4A4A3C;">1,080</span></li>
+        <li data-row style="display: flex; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid rgba(31,69,49,0.16); animation-range: entry 14% entry 60%; transition: padding-left 0.4s cubic-bezier(0.22,1,0.36,1), color 0.35s ease;" style-hover="padding-left: 12px; color: #7C9B3C;"><span>抹茶巴斯克（單片）</span><span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #4A4A3C;">180</span></li>
+        <li data-row style="display: flex; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid rgba(31,69,49,0.16); animation-range: entry 18% entry 64%; transition: padding-left 0.4s cubic-bezier(0.22,1,0.36,1), color 0.35s ease;" style-hover="padding-left: 12px; color: #7C9B3C;"><span>紅豆抹茶餅（兩入）</span><span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #4A4A3C;">320</span></li>
+        <li data-row style="display: flex; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid rgba(31,69,49,0.16); animation-range: entry 22% entry 68%; transition: padding-left 0.4s cubic-bezier(0.22,1,0.36,1), color 0.35s ease;" style-hover="padding-left: 12px; color: #7C9B3C;"><span>抹茶白玉杯</span><span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #4A4A3C;">160</span></li>
+        <li data-row style="display: flex; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid rgba(31,69,49,0.16); animation-range: entry 26% entry 72%; transition: padding-left 0.4s cubic-bezier(0.22,1,0.36,1), color 0.35s ease;" style-hover="padding-left: 12px; color: #7C9B3C;"><span>抹茶千層小方</span><span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #4A4A3C;">220</span></li>
+        <li data-row style="display: flex; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid rgba(31,69,49,0.16); animation-range: entry 30% entry 76%; transition: padding-left 0.4s cubic-bezier(0.22,1,0.36,1), color 0.35s ease;" style-hover="padding-left: 12px; color: #7C9B3C;"><span>焙茶蕨餅</span><span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #4A4A3C;">240</span></li>
+        <li data-row style="display: flex; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid rgba(31,69,49,0.16); animation-range: entry 34% entry 80%; transition: padding-left 0.4s cubic-bezier(0.22,1,0.36,1), color 0.35s ease;" style-hover="padding-left: 12px; color: #7C9B3C;"><span>抹茶罐裝茶粉（30g）</span><span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #4A4A3C;">980</span></li>
+      </ul>
+      <p style="margin: 28px 0 0; font-size: 13px; font-weight: 300; color: #4A4A3C;">單位：新台幣。整席預訂請於三日前來電，內用附一碗自點抹茶。</p>
+    </div>
+  </section>
+
+  <section id="visit" style="padding: clamp(64px, 9vw, 120px) 5vw; background: #FCF4E4;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: clamp(28px, 4vw, 64px); max-width: 1180px; margin: 0 auto;">
+      <div data-reveal>
+        <h2 data-wipe style="margin: 0 0 20px; font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Noto Serif TC', serif; font-weight: 600; font-size: clamp(26px, 3.2vw, 44px); color: #1F4531;">來店</h2>
+        <p style="margin: 0; font-size: 15px; font-weight: 300; line-height: 2; color: #4A4A3C;">台北市大安區永康街 12 巷 5 號<br>週三至週日 12:00 — 19:00<br>02-2708-0412</p>
+      </div>
+      <div data-reveal style="align-self: end;">
+        <p style="margin: 0 0 14px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.24em; color: #7C9B3C; text-transform: uppercase;">reservation</p>
+        <p style="margin: 0 0 22px; font-size: 15px; font-weight: 300; line-height: 2; color: #4A4A3C;">四人以上茶席請預約，每日兩席，14:00 與 17:00。</p>
+        <a href="#" onClick="{{ openBooking }}" style="display: inline-block; padding: 14px 30px; border-radius: 999px; background: #1F4531; color: #FCF4E4; font-size: 13px; letter-spacing: 0.14em; transition: background 0.35s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1), box-shadow 0.4s ease;" style-hover="background: #7C9B3C; transform: translateY(-3px); box-shadow: 0 16px 28px -18px rgba(31,69,49,0.7);">預約茶席</a>
+      </div>
+    </div>
+  </section>
+
+  <sc-if value="{{ isOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ close }}" style="position: fixed; inset: 0; z-index: 90; background: rgba(23,36,28,0.58); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 4vw; animation: overlayIn 0.35s ease both;">
+      <div onClick="{{ stop }}" style="position: relative; width: min(940px, 100%); max-height: 88vh; overflow: auto; background: #FCF4E4; border-radius: 6px; box-shadow: 0 40px 80px -40px rgba(23,36,28,0.7); animation: sheetIn 0.6s cubic-bezier(0.22,1,0.36,1) both; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));">
+        <div style="aspect-ratio: 4 / 5; min-height: 260px; background: #F1E4C4; display: flex; align-items: center; justify-content: center; text-align: center;">
+          <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: #6B6A5C;">product shot<br>{{ item.name }}</span>
+        </div>
+        <div style="padding: clamp(24px, 3vw, 44px); display: flex; flex-direction: column; gap: 18px;">
+          <div>
+            <p style="margin: 0 0 10px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: #7C9B3C; text-transform: uppercase;">{{ item.en }}</p>
+            <h3 style="margin: 0; font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Noto Serif TC', serif; font-weight: 600; font-size: clamp(26px, 3vw, 38px); color: #1F4531;">{{ item.name }}</h3>
+          </div>
+          <p style="margin: 0; font-size: 14px; font-weight: 300; line-height: 2; color: #4A4A3C;">{{ item.desc }}</p>
+          <dl style="margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 10px 20px; font-size: 13px;">
+            <sc-for list="{{ specs }}" as="row" hint-placeholder-count="4">
+              <dt style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: #7C9B3C; text-transform: uppercase; align-self: center;">{{ row.k }}</dt>
+              <dd style="margin: 0; font-weight: 300; color: #4A4A3C;">{{ row.v }}</dd>
+            </sc-for>
+          </dl>
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 4px;">
+            <span style="font-family: 'DM Mono', monospace; font-size: 13px; color: #1F4531;">{{ item.price }}</span>
+            <button type="button" onClick="{{ openBooking }}" style="padding: 12px 26px; border: none; border-radius: 999px; background: #1F4531; color: #FCF4E4; font-family: 'Noto Sans TC', sans-serif; font-size: 13px; letter-spacing: 0.12em; cursor: pointer; transition: background 0.35s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1);" style-hover="background: #7C9B3C; transform: translateY(-2px);">預約茶席</button>
+          </div>
+        </div>
+        <button type="button" onClick="{{ close }}" aria-label="關閉" style="position: absolute; top: 14px; right: 14px; width: 38px; height: 38px; border-radius: 999px; border: 1px solid rgba(31,69,49,0.25); background: rgba(252,244,228,0.9); color: #1F4531; font-size: 16px; line-height: 1; cursor: pointer; transition: background 0.3s ease;" style-hover="background: #F4DC94;">✕</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ booking }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeBooking }}" style="position: fixed; inset: 0; z-index: 95; background: rgba(23,36,28,0.62); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 4vw; animation: overlayIn 0.35s ease both;">
+      <div onClick="{{ stop }}" style="position: relative; width: min(560px, 100%); max-height: 88vh; overflow: auto; background: #FCF4E4; border-radius: 6px; padding: clamp(26px, 4vw, 48px); box-shadow: 0 40px 80px -40px rgba(23,36,28,0.7); animation: sheetIn 0.6s cubic-bezier(0.22,1,0.36,1) both;">
+        <p style="margin: 0 0 10px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: #7C9B3C; text-transform: uppercase;">reservation</p>
+        <h3 style="margin: 0 0 22px; font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Noto Serif TC', serif; font-weight: 600; font-size: clamp(26px, 3vw, 38px); color: #1F4531;">預約茶席</h3>
+        <sc-if value="{{ notSent }}" hint-placeholder-val="{{ true }}">
+          <form onSubmit="{{ submit }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 18px;">
+            <label style="display: flex; flex-direction: column; gap: 8px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: #7C9B3C; text-transform: uppercase;">date
+              <input type="date" required style="font-family: 'Noto Sans TC', sans-serif; font-size: 14px; color: #2B2A20; padding: 12px 14px; border: 1px solid rgba(31,69,49,0.25); border-radius: 4px; background: #FFFBF0;">
+            </label>
+            <label style="display: flex; flex-direction: column; gap: 8px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: #7C9B3C; text-transform: uppercase;">time
+              <select required style="font-family: 'Noto Sans TC', sans-serif; font-size: 14px; color: #2B2A20; padding: 12px 14px; border: 1px solid rgba(31,69,49,0.25); border-radius: 4px; background: #FFFBF0;">
+                <option>14:00 茶席</option>
+                <option>17:00 茶席</option>
+              </select>
+            </label>
+            <label style="display: flex; flex-direction: column; gap: 8px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: #7C9B3C; text-transform: uppercase;">guests
+              <select required style="font-family: 'Noto Sans TC', sans-serif; font-size: 14px; color: #2B2A20; padding: 12px 14px; border: 1px solid rgba(31,69,49,0.25); border-radius: 4px; background: #FFFBF0;">
+                <option>4 位</option>
+                <option>5 位</option>
+                <option>6 位</option>
+                <option>7 位以上（來電）</option>
+              </select>
+            </label>
+            <label style="display: flex; flex-direction: column; gap: 8px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: #7C9B3C; text-transform: uppercase;">name
+              <input type="text" required placeholder="王小滿" style="font-family: 'Noto Sans TC', sans-serif; font-size: 14px; color: #2B2A20; padding: 12px 14px; border: 1px solid rgba(31,69,49,0.25); border-radius: 4px; background: #FFFBF0;">
+            </label>
+            <label style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 8px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: #7C9B3C; text-transform: uppercase;">phone
+              <input type="tel" required placeholder="0912 345 678" style="font-family: 'Noto Sans TC', sans-serif; font-size: 14px; color: #2B2A20; padding: 12px 14px; border: 1px solid rgba(31,69,49,0.25); border-radius: 4px; background: #FFFBF0;">
+            </label>
+            <label style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 8px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: #7C9B3C; text-transform: uppercase;">note
+              <textarea rows="3" placeholder="想預留的品項、飲食禁忌" style="font-family: 'Noto Sans TC', sans-serif; font-size: 14px; color: #2B2A20; padding: 12px 14px; border: 1px solid rgba(31,69,49,0.25); border-radius: 4px; background: #FFFBF0; resize: vertical;"></textarea>
+            </label>
+            <button type="submit" style="grid-column: 1 / -1; justify-self: start; padding: 14px 32px; border: none; border-radius: 999px; background: #1F4531; color: #FCF4E4; font-family: 'Noto Sans TC', sans-serif; font-size: 13px; letter-spacing: 0.14em; cursor: pointer; transition: background 0.35s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1);" style-hover="background: #7C9B3C; transform: translateY(-2px);">送出預約</button>
+            <p style="grid-column: 1 / -1; margin: 0; font-size: 12px; font-weight: 300; color: #4A4A3C;">每日兩席，各限一組。送出後我們會於營業時間內電話確認。</p>
+          </form>
+        </sc-if>
+        <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 16px; animation: sheetIn 0.5s cubic-bezier(0.22,1,0.36,1) both;">
+            <p style="margin: 0; font-size: 15px; font-weight: 300; line-height: 2; color: #4A4A3C;">已收到預約，我們會在營業時間內回電確認。當日請提早五分鐘到店，茶席準時開始。</p>
+            <button type="button" onClick="{{ closeBooking }}" style="align-self: start; padding: 13px 28px; border: 1px solid rgba(31,69,49,0.3); border-radius: 999px; background: transparent; font-family: 'Noto Sans TC', sans-serif; font-size: 13px; letter-spacing: 0.12em; color: #1F4531; cursor: pointer; transition: background 0.35s ease;" style-hover="background: rgba(124,155,60,0.16);">回到網站</button>
+          </div>
+        </sc-if>
+        <button type="button" onClick="{{ closeBooking }}" aria-label="關閉" style="position: absolute; top: 14px; right: 14px; width: 38px; height: 38px; border-radius: 999px; border: 1px solid rgba(31,69,49,0.25); background: rgba(252,244,228,0.9); color: #1F4531; font-size: 16px; line-height: 1; cursor: pointer; transition: background 0.3s ease;" style-hover="background: #F4DC94;">✕</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <footer style="padding: 36px 5vw; background: #1F4531; color: #DCDCC8; display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;">
+    <span>青翠 matcha atelier</span>
+    <span>taipei — est. 2019</span>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { open: null, booking: false, sent: false };
+
+  items = {
+    roll: {
+      name: '抹茶生乳捲', en: 'matcha cream roll', price: 'NT$ 680 / 條',
+      swatch: 'repeating-linear-gradient(135deg, #F1E4C4 0 10px, #FCF4E4 10px 20px)',
+      desc: '焙茶蛋糕體薄薄一層，捲入不加糖的抹茶鮮奶油。切面是一顆滾圓的綠，邊緣有一圈焙茶的深色。冷藏兩小時後食用最好，奶油會剛好定形而不硬。',
+      specs: [{ k: '尺寸', v: '長 18cm / 約 6 片' }, { k: '抹茶', v: '宇治覆下・石磨' }, { k: '保存', v: '冷藏 2 日，不冷凍' }, { k: '過敏原', v: '乳、蛋、小麥' }]
+    },
+    basque: {
+      name: '抹茶巴斯克', en: 'matcha basque cheesecake', price: 'NT$ 1,080 / 模',
+      swatch: 'repeating-linear-gradient(135deg, #E3EBCB 0 10px, #FCF4E4 10px 20px)',
+      desc: '高溫短時烤出焦色的表面，鋪滿抹茶菠蘿粒；內裡近乎流動，靠冷藏才收住。整模六吋，切八刀剛好，室溫回溫十分鐘風味最完整。',
+      specs: [{ k: '尺寸', v: '六吋 / 8 片' }, { k: '抹茶', v: '宇治覆下・石磨' }, { k: '保存', v: '冷藏 3 日' }, { k: '過敏原', v: '乳、蛋' }]
+    },
+    cake: {
+      name: '紅豆抹茶餅', en: 'azuki matcha pastry', price: 'NT$ 320 / 盒',
+      swatch: 'repeating-linear-gradient(135deg, #F3D6B4 0 10px, #FCF4E4 10px 20px)',
+      desc: '烙印的抹茶餅皮夾大納言粒餡，紅豆整顆留形，只糖漬不磨泥。現烤裝盒，帶回去的路上還是溫的。兩入一盒，也可單買。',
+      specs: [{ k: '份量', v: '兩入 / 盒' }, { k: '紅豆', v: '北海道大納言' }, { k: '保存', v: '常溫當日，冷藏 3 日' }, { k: '過敏原', v: '小麥、乳' }]
+    }
+  };
+
+  open = (k) => () => this.setState({ open: k });
+  close = () => this.setState({ open: null });
+  openBooking = (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ booking: true, sent: false, open: null }); };
+  closeBooking = () => this.setState({ booking: false, sent: false });
+  submit = (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ sent: true }); };
+
+  renderVals() {
+    const k = this.state.open;
+    const item = (k && this.items[k]) || { name: '', en: '', price: '', desc: '', specs: [], swatch: 'none' };
+    return {
+      isOpen: !!k, item, specs: item.specs,
+      openRoll: this.open('roll'), openBasque: this.open('basque'), openCake: this.open('cake'),
+      close: this.close, stop: (e) => e.stopPropagation(),
+      booking: this.state.booking, openBooking: this.openBooking, closeBooking: this.closeBooking,
+      submit: this.submit, sent: this.state.sent, notSent: !this.state.sent
+    };
+  }
+}
+</script>
+</body>
+</html>
