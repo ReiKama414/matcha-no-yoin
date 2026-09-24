@@ -4,23 +4,17 @@ import { featuredItems, menuItems, navLinks } from './data/menu'
 import { useMatchaMotion } from './hooks/useMatchaMotion'
 import './index.css'
 
-const heroTitleLines = ['一席抹茶', '擺滿整張餐桌']
-
 export default function App() {
   const [openId, setOpenId] = useState<string | null>(null)
   const [booking, setBooking] = useState(false)
   const [sent, setSent] = useState(false)
 
   useMatchaMotion(true)
-
   const openItem = featuredItems.find((item) => item.id === openId) ?? null
 
   useEffect(() => {
-    const locked = Boolean(openItem || booking)
-    document.body.style.overflow = locked ? 'hidden' : ''
-    return () => {
-      document.body.style.overflow = ''
-    }
+    document.body.style.overflow = openItem || booking ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
   }, [openItem, booking])
 
   const openBooking = () => {
@@ -42,244 +36,132 @@ export default function App() {
   return (
     <div className="page">
       <header className="site-header">
-        <div className="header-inner">
-          <div className="brand">
-            <span className="brand-name">青翠</span>
-            <span className="brand-sub">matcha atelier</span>
-          </div>
-          <nav className="nav" aria-label="主要導覽">
-            {navLinks.map((link) => (
-              <a key={link.href} href={link.href}>
-                {link.label}
-              </a>
-            ))}
-          </nav>
+        <a className="brand" href="#top" aria-label="青埜首頁">
+          <span className="brand-mark">青埜</span><span className="brand-sub">Matcha Atelier</span>
+        </a>
+        <nav className="nav" aria-label="主要導覽">
+          {navLinks.map((link) => <a key={link.href} href={link.href}>{link.label}</a>)}
+        </nav>
+        <div className="header-actions">
+          <a className="version-switch mono" href="/legacy.html">切換舊版</a>
+          <button type="button" className="header-book" onClick={openBooking}>茶席預約</button>
         </div>
         <div data-bar className="progress-bar" />
       </header>
 
-      <section className="hero">
-        <div className="hero-copy">
-          <p className="mono season-tag">season 2026 / uji harvest</p>
-          <h1 className="serif hero-title">
-            {heroTitleLines.map((line) => (
-              <span key={line} className="title-line">
-                {[...line].map((char, i) => (
-                  <span key={`${line}-${i}`}>{char}</span>
-                ))}
-              </span>
-            ))}
-          </h1>
-          <p className="hero-lead">
-            從宇治石磨抹茶到大納言紅豆，十二道甜點以同一片綠色串起。每一季我們只做一桌，端上來的時候，桌布也是這個顏色。
-          </p>
-          <div className="hero-ctas">
-            <a href="#menu" className="btn btn-solid">
-              看今季品項
-            </a>
-            <button type="button" className="btn btn-outline" onClick={openBooking}>
-              預約茶席
-            </button>
+      <main>
+        <section id="top" className="hero">
+          <div className="hero-kicker mono" data-hero-copy>UJI / TAIPEI<br />SEASON 2026</div>
+          <div className="hero-title-wrap" data-hero-copy>
+            <p className="hero-jp">一席、十五味</p>
+            <h1 className="serif">一席抹茶<br /><span>擺滿整張餐桌</span></h1>
           </div>
-        </div>
-
-        <figure data-shutter className="hero-figure">
-          <img
-            data-pan
-            src="/hero.png?v=4"
-            alt="抹茶甜點全桌"
-            width={1180}
-            height={740}
-          />
-        </figure>
-        <figcaption className="hero-caption">the whole table, seasonal pieces</figcaption>
-      </section>
-
-      <section id="season" className="section season">
-        <div className="section-inner">
-          <div className="section-head">
-            <h2 data-wipe className="serif">
-              今季三款招牌
-            </h2>
-            <span className="mono">01 — 03</span>
+          <figure className="hero-figure" data-hero-image>
+            <div className="image-mask"><img data-parallax src="/hero.png?v=4" alt="青埜本季抹茶甜點全席" width={1280} height={720} /></div>
+            <figcaption className="mono">THE WHOLE TABLE — SEASONAL PIECES</figcaption>
+          </figure>
+          <div className="hero-note" data-hero-copy>
+            <p>從宇治石磨抹茶到大納言紅豆，十二道甜點以同一片綠色串起。每一季我們只做一桌，端上來的時候，桌布也是這個顏色。</p>
+            <div className="hero-actions">
+              <a className="text-link" href="#season">看今季品項</a>
+              <button className="text-link quiet" type="button" onClick={openBooking}>預約茶席</button>
+            </div>
           </div>
+          <span className="hero-index mono">01</span>
+        </section>
 
-          <div className="cards">
-            {featuredItems.map((item) => (
-              <article data-reveal key={item.id} className="card">
-                <div className="card-shot">
-                  <img src={item.image} alt={item.name} width={640} height={800} />
-                </div>
-                <h3 className="serif">{item.name}</h3>
-                <p>{item.summary}</p>
-                <div className="card-meta">
-                  <span className="mono">{item.price}</span>
-                  <button
-                    type="button"
-                    className="btn btn-ghost"
-                    onClick={() => setOpenId(item.id)}
-                  >
-                    看細節
-                  </button>
+        <section id="season" className="section signatures">
+          <header className="editorial-head" data-reveal>
+            <p className="mono section-no">01 / SIGNATURES</p>
+            <h2 className="serif">今季，三款招牌</h2>
+            <p>風味各有性格，抹茶的清苦始終是主線。</p>
+          </header>
+          <div className="signature-list">
+            {featuredItems.map((item, index) => (
+              <article className={`signature signature-${index + 1}`} key={item.id} data-product>
+                <button className="product-image" type="button" onClick={() => setOpenId(item.id)} aria-label={`查看${item.name}細節`}>
+                  <span className="image-mask"><img src={item.image} alt={item.name} width={864} height={1152} /></span>
+                </button>
+                <div className="product-copy">
+                  <span className="mono product-no">0{index + 1}</span>
+                  <p className="mono product-en">{item.en}</p>
+                  <h3 className="serif">{item.name}</h3>
+                  <p className="product-summary">{item.summary}</p>
+                  <div className="product-meta">
+                    <span className="mono">{item.price}</span>
+                    <button className="text-link" type="button" onClick={() => setOpenId(item.id)}>閱讀細節</button>
+                  </div>
                 </div>
               </article>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section id="craft" className="section craft">
-        <div className="section-inner craft-grid">
-          <div>
-            <p data-reveal className="mono craft-label">
-              craft
-            </p>
-            <h2 data-wipe className="serif craft-title">
-              石磨一小時
-              <br />
-              只得四十克
-            </h2>
-            <p data-reveal className="craft-text">
-              茶園採的是四月第一批覆下茶，蒸青、乾燥、去莖，再以石臼低速研磨。轉快了會生熱，熱了就苦。
-            </p>
-            <p data-reveal className="craft-text">
-              所有甜點在開店前三小時內完成，不隔夜。當日沒賣完的，我們自己吃。
-            </p>
-            <div className="stats">
-              <div>
-                <div className="stat-value serif">
-                  <span data-count>40</span>
-                  <span className="stat-unit">g</span>
-                </div>
-                <div className="mono stat-label">每小時產量</div>
-              </div>
-              <div>
-                <div className="stat-value serif">
-                  <span data-count>15</span>
-                </div>
-                <div className="mono stat-label">今季品項</div>
-              </div>
-              <div>
-                <div className="stat-value serif">
-                  <span data-count>3</span>
-                  <span className="stat-unit">h</span>
-                </div>
-                <div className="mono stat-label">開店前完成</div>
-              </div>
+        <section id="craft" className="section craft">
+          <div className="craft-image" data-image-reveal>
+            <div className="image-mask"><img data-craft-parallax src="/craft.png" alt="石磨抹茶與茶筅" width={1024} height={1024} /></div>
+            <span className="mono vertical-caption">STONE MILLED / KYOTO UJI</span>
+          </div>
+          <div className="craft-copy">
+            <p className="mono section-no" data-reveal>02 / THE CRAFT</p>
+            <h2 className="serif" data-title-reveal>石磨一小時<br /><em>只得四十克</em></h2>
+            <div className="craft-body" data-reveal>
+              <p>茶園採的是四月第一批覆下茶，蒸青、乾燥、去莖，再以石臼低速研磨。轉快了會生熱，熱了就苦。</p>
+              <p>所有甜點在開店前三小時內完成，不隔夜。當日沒賣完的，我們自己吃。</p>
             </div>
+            <dl className="stats" data-reveal>
+              <div><dt><span data-count>40</span><small>g</small></dt><dd>每小時產量</dd></div>
+              <div><dt><span data-count>15</span></dt><dd>今季品項</dd></div>
+              <div><dt><span data-count>3</span><small>h</small></dt><dd>開店前完成</dd></div>
+            </dl>
           </div>
-          <div data-shutter className="craft-shot">
-            <img src="/craft.png" alt="石磨與茶筅" width={800} height={800} />
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <div className="ribbons" aria-hidden="true">
-        <div className="ribbon ribbon-l">
-          <span>
-            宇治覆下<span className="mono">01</span>石臼低速
-            <span className="mono">02</span>大納言紅豆
-            <span className="mono">03</span>當日現做
-            <span className="mono">04</span>
-          </span>
-          <span>
-            宇治覆下<span className="mono">01</span>石臼低速
-            <span className="mono">02</span>大納言紅豆
-            <span className="mono">03</span>當日現做
-            <span className="mono">04</span>
-          </span>
-        </div>
-        <div className="ribbon ribbon-r">
-          <span className="mono">
-            <span>stone milled</span>
-            <span>kyoto uji</span>
-            <span>no preservatives</span>
-            <span>made daily</span>
-            <span>taipei</span>
-            <span>stone milled</span>
-            <span>kyoto uji</span>
-            <span>no preservatives</span>
-            <span>made daily</span>
-            <span>taipei</span>
-          </span>
-          <span className="mono">
-            <span>stone milled</span>
-            <span>kyoto uji</span>
-            <span>no preservatives</span>
-            <span>made daily</span>
-            <span>taipei</span>
-            <span>stone milled</span>
-            <span>kyoto uji</span>
-            <span>no preservatives</span>
-            <span>made daily</span>
-            <span>taipei</span>
-          </span>
-        </div>
-      </div>
+        <section id="menu" className="section menu">
+          <header className="menu-head" data-reveal>
+            <p className="mono section-no">03 / MENU</p>
+            <div><h2 className="serif">全席品項</h2><p className="mono">2026 AUTUMN</p></div>
+          </header>
+          <div className="menu-body">
+            <p className="menu-intro" data-reveal>十五款當日甜點與茶品。<br />數量有限，售完為止。</p>
+            <ol className="menu-list">
+              {menuItems.map((item, index) => (
+                <li key={item.name} data-menu-row>
+                  <span className="mono">{String(index + 1).padStart(2, '0')}</span>
+                  <span>{item.name}</span>
+                  <span className="mono">{item.price}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <p className="menu-note">單位：新台幣。整席預訂請於三日前來電，內用附一碗自點抹茶。</p>
+        </section>
 
-      <section id="menu" className="section menu">
-        <div data-reveal className="menu-panel">
-          <div className="section-head">
-            <h2 data-wipe className="serif">
-              全席品項
-            </h2>
-            <span className="mono">menu / 2026 autumn</span>
+        <section id="visit" className="section visit">
+          <div className="visit-title" data-title-reveal>
+            <p className="mono section-no">04 / VISIT</p>
+            <h2 className="serif">留一席，<br />給午後的茶。</h2>
           </div>
-          <ul>
-            {menuItems.map((item) => (
-              <li data-row key={item.name}>
-                <span>{item.name}</span>
-                <span className="mono">{item.price}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="menu-note">
-            單位：新台幣。整席預訂請於三日前來電，內用附一碗自點抹茶。
-          </p>
-        </div>
-      </section>
-
-      <section id="visit" className="section visit">
-        <div className="section-inner visit-grid">
-          <div data-reveal>
-            <h2 data-wipe className="serif">
-              來店
-            </h2>
-            <p className="visit-text">
-              台北市青葉區茶園路一段 8 巷 3 號
-              <br />
-              週三至週日 12:00 — 19:00
-              <br />
-              02-0000-0412
-            </p>
+          <div className="visit-info" data-reveal>
+            <p className="mono label">ADDRESS</p>
+            <address>台北市青葉區<br />茶園路一段 8 巷 3 號</address>
+            <p className="mono label">OPEN</p>
+            <p>週三至週日 12:00 — 19:00<br />02-0000-0412</p>
           </div>
-          <div data-reveal className="visit-cta">
-            <p className="mono eyebrow">reservation</p>
-            <p className="visit-text">
-              四人以上茶席請預約，每日兩席，14:00 與 17:00。
-            </p>
-            <button type="button" className="btn btn-solid" onClick={openBooking}>
-              預約茶席
-            </button>
+          <div className="visit-book" data-reveal>
+            <p>四人以上茶席請預約，<br />每日兩席，14:00 與 17:00。</p>
+            <button type="button" className="round-link" onClick={openBooking}>預約茶席 <span>↗</span></button>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
       <footer className="site-footer">
-        <span>青翠 matcha atelier</span>
-        <span>taipei — est. 2019</span>
+        <div><strong className="serif">青埜</strong><span className="mono">MATCHA ATELIER</span></div>
+        <p className="mono">TAIPEI — EST. 2019</p><a className="mono" href="#top">BACK TO TOP ↑</a>
       </footer>
 
-      {openItem && (
-        <ProductModal
-          item={openItem}
-          onClose={() => setOpenId(null)}
-          onBook={openBooking}
-        />
-      )}
-      {booking && (
-        <BookingModal sent={sent} onClose={closeBooking} onSubmit={submitBooking} />
-      )}
+      {openItem && <ProductModal item={openItem} onClose={() => setOpenId(null)} onBook={openBooking} />}
+      {booking && <BookingModal sent={sent} onClose={closeBooking} onSubmit={submitBooking} />}
     </div>
   )
 }

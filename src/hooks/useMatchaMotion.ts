@@ -4,178 +4,119 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-function whenSeen(el: Element, run: () => void) {
-  if (!('IntersectionObserver' in window)) {
-    run()
-    return
-  }
-
-  const io = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          io.disconnect()
-          run()
-        }
-      })
-    },
-    { rootMargin: '0px 0px -8% 0px', threshold: 0.05 },
-  )
-
-  io.observe(el)
-  window.setTimeout(() => {
-    io.disconnect()
-    run()
-  }, 9000)
-}
-
 export function useMatchaMotion(enabled: boolean) {
   useEffect(() => {
     if (!enabled) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reducedMotion) return
 
     document.body.setAttribute('data-gsap', '1')
 
-    const ease = 'power3.out'
     const ctx = gsap.context(() => {
-      gsap.from('h1 span span', {
-        yPercent: 70,
-        opacity: 0,
-        rotate: 5,
-        filter: 'blur(12px)',
-        duration: 1.1,
-        ease: 'expo.out',
-        stagger: 0.06,
-        delay: 0.1,
-      })
-
-      gsap.from('h1 ~ p, h1 ~ div', {
-        y: 26,
-        opacity: 0,
-        duration: 1,
-        ease,
-        stagger: 0.12,
-        delay: 0.85,
-      })
-
-      const play = (
-        el: Element,
-        from: gsap.TweenVars,
-        extra?: gsap.TweenVars,
-      ) => {
-        gsap.fromTo(
-          el,
-          from,
-          {
-            opacity: 1,
+      const mm = gsap.matchMedia()
+      const reveal = (selector: string, vars: gsap.TweenVars) => {
+        gsap.utils.toArray<HTMLElement>(selector).forEach((element) => {
+          gsap.set(element, { autoAlpha: 0, ...vars })
+          gsap.to(element, {
+            autoAlpha: 1,
             x: 0,
             y: 0,
-            yPercent: 0,
             scale: 1,
             clipPath: 'inset(0% 0% 0% 0%)',
-            duration: 1.1,
-            ease,
-            clearProps: 'clipPath,filter',
-            ...extra,
-          },
-        )
-      }
-
-      const group = (
-        sel: string,
-        from: gsap.TweenVars,
-        extra?: gsap.TweenVars,
-        step = 0,
-      ) => {
-        gsap.utils.toArray<Element>(sel).forEach((el, i) => {
-          whenSeen(el, () => play(el, from, { delay: step * i, ...extra }))
-        })
-      }
-
-      group('[data-reveal]:not(#season article)', {
-        opacity: 0,
-        y: 46,
-        scale: 0.985,
-      })
-      group(
-        '[data-wipe]',
-        { opacity: 0, yPercent: 28, clipPath: 'inset(100% 0% 0% 0%)' },
-        { duration: 1.15, ease: 'expo.out' },
-      )
-      group(
-        '[data-shutter]',
-        { clipPath: 'inset(0% 0% 100% 0%)' },
-        { duration: 1.4, ease: 'expo.out' },
-      )
-      group('#season article', { opacity: 0, y: 56 }, undefined, 0.1)
-
-      gsap.utils.toArray<HTMLElement>('#menu ul').forEach((ul) => {
-        whenSeen(ul, () => {
-          gsap.fromTo(
-            ul.children,
-            { opacity: 0, x: -28 },
-            { opacity: 1, x: 0, duration: 0.8, ease, stagger: 0.06 },
-          )
-        })
-      })
-
-      const img = document.querySelector('[data-pan]')
-      if (img?.parentElement) {
-        gsap.set(img, { scale: 1.14 })
-        gsap.to(img, {
-          yPercent: -7,
-          scale: 1.02,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: img.parentElement,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: 0.6,
-          },
-        })
-      }
-
-      const bar = document.querySelector<HTMLElement>('[data-bar]')
-      if (bar) {
-        const tick = () => {
-          const max =
-            document.documentElement.scrollHeight - window.innerHeight || 1
-          const p = Math.min(
-            1,
-            Math.max(0, (window.scrollY || document.documentElement.scrollTop) / max),
-          )
-          bar.style.transformOrigin = 'left center'
-          bar.style.transform = `scaleX(${p})`
-        }
-        window.addEventListener('scroll', tick, { passive: true })
-        window.addEventListener('resize', tick)
-        tick()
-      }
-
-      gsap.utils.toArray<HTMLElement>('[data-count]').forEach((el) => {
-        const end = parseFloat(el.textContent || '0') || 0
-        const o = { v: 0 }
-        whenSeen(el, () => {
-          gsap.to(o, {
-            v: end,
-            duration: 1.4,
-            ease: 'power2.out',
-            onUpdate: () => {
-              el.textContent = String(Math.round(o.v))
-            },
-            onComplete: () => {
-              el.textContent = String(end)
-            },
+            duration: 1.15,
+            ease: 'power3.out',
+            clearProps: 'clipPath',
+            scrollTrigger: { trigger: element, start: 'top 86%', once: true },
           })
         })
+      }
+
+      const hero = gsap.timeline({ defaults: { ease: 'power3.out' } })
+      hero
+        .set('[data-hero-copy], [data-hero-image]', { autoAlpha: 1 })
+        .from('[data-hero-image]', { clipPath: 'inset(0% 0% 100% 0%)', duration: 1.4, ease: 'expo.inOut' })
+        .from('[data-hero-image] img', { scale: 1.08, duration: 1.8, ease: 'power2.out' }, '<.15')
+        .from('.hero-title-wrap', { y: 35, opacity: 0, duration: 1.1 }, '-=.9')
+        .from('.hero-kicker', { opacity: 0, duration: .7 }, '-=.65')
+        .from('.hero-note', { y: 18, opacity: 0, duration: .9 }, '-=.55')
+
+      reveal('[data-reveal]', { y: 28 })
+      reveal('[data-title-reveal]', { y: 42, clipPath: 'inset(0% 0% 100% 0%)' })
+      reveal('[data-image-reveal]', { clipPath: 'inset(0% 0% 100% 0%)' })
+
+      gsap.utils.toArray<HTMLElement>('[data-product]').forEach((product, index) => {
+        const image = product.querySelector('.product-image')
+        const copy = product.querySelector('.product-copy')
+        const direction = index % 2 ? 24 : -24
+        gsap.set(product, { autoAlpha: 1 })
+        gsap.from(image, {
+          clipPath: index % 2 ? 'inset(0% 100% 0% 0%)' : 'inset(0% 0% 0% 100%)',
+          duration: 1.25,
+          ease: 'expo.out',
+          scrollTrigger: { trigger: product, start: 'top 78%', once: true },
+        })
+        gsap.from(copy, {
+          x: direction,
+          opacity: 0,
+          duration: 1,
+          delay: .18,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: product, start: 'top 78%', once: true },
+        })
       })
 
-      ScrollTrigger.refresh()
+      const menuRows = gsap.utils.toArray<HTMLElement>('[data-menu-row]')
+      gsap.set(menuRows, { autoAlpha: 0 })
+      ScrollTrigger.create({
+        trigger: '.menu-list',
+        start: 'top 82%',
+        once: true,
+        onEnter: () => gsap.to(menuRows, { autoAlpha: 1, duration: .6, stagger: .045, ease: 'power2.out' }),
+      })
+
+      gsap.utils.toArray<HTMLElement>('[data-count]').forEach((element) => {
+        const end = Number(element.textContent) || 0
+        const state = { value: 0 }
+        ScrollTrigger.create({
+          trigger: element,
+          start: 'top 90%',
+          once: true,
+          onEnter: () => gsap.to(state, {
+            value: end,
+            duration: 1.2,
+            ease: 'power2.out',
+            onUpdate: () => { element.textContent = String(Math.round(state.value)) },
+          }),
+        })
+      })
+
+      gsap.to('[data-bar]', {
+        scaleX: 1,
+        ease: 'none',
+        scrollTrigger: { start: 0, end: 'max', scrub: .15 },
+      })
+
+      mm.add('(min-width: 701px)', () => {
+        gsap.to('[data-parallax]', {
+          yPercent: 5,
+          ease: 'none',
+          scrollTrigger: { trigger: '.hero-figure', start: 'top bottom', end: 'bottom top', scrub: .6 },
+        })
+        gsap.fromTo('[data-craft-parallax]', { yPercent: -5 }, {
+          yPercent: 0,
+          ease: 'none',
+          scrollTrigger: { trigger: '.craft', start: 'top bottom', end: 'bottom top', scrub: .7 },
+        })
+      })
+
+      requestAnimationFrame(() => ScrollTrigger.refresh())
+      return () => mm.revert()
     })
 
     return () => {
-      document.body.removeAttribute('data-gsap')
       ctx.revert()
+      document.body.removeAttribute('data-gsap')
     }
   }, [enabled])
 }
